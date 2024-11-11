@@ -214,13 +214,21 @@ impl EventHandler for GameState {
             canvas.draw(&mesh, graphics::DrawParam::default());
         }
         
-        // Draw the player
-        let player = graphics::Mesh::new_circle(
+        // Draw the player (triangular ship)
+        let angle = (self.player_segment as f32 * 2.0 * PI) / NUM_SEGMENTS as f32;
+        let direction = Vec2::new(angle.cos(), angle.sin());
+        let perp = Vec2::new(-direction.y, direction.x);
+        
+        let player_points = [
+            self.player_pos - perp * 8.0,  // left point
+            self.player_pos + direction * 15.0,  // front point
+            self.player_pos + perp * 8.0,  // right point
+        ];
+        
+        let player = graphics::Mesh::new_polygon(
             ctx,
             DrawMode::fill(),
-            self.player_pos,
-            10.0,
-            0.1,
+            &player_points,
             Color::WHITE,
         )?;
         
@@ -241,12 +249,20 @@ impl EventHandler for GameState {
 
         // Draw enemies
         for enemy in &self.enemies {
-            let enemy_mesh = graphics::Mesh::new_circle(
+            // Create rotating diamond shape for enemy
+            let rotation = timer::time_since_start(ctx).as_secs_f32() * 2.0;
+            let size = 10.0;
+            let enemy_points = [
+                Vec2::new(enemy.pos.x + size * rotation.cos(), enemy.pos.y + size * rotation.sin()),
+                Vec2::new(enemy.pos.x - size * rotation.sin(), enemy.pos.y + size * rotation.cos()),
+                Vec2::new(enemy.pos.x - size * rotation.cos(), enemy.pos.y - size * rotation.sin()),
+                Vec2::new(enemy.pos.x + size * rotation.sin(), enemy.pos.y - size * rotation.cos()),
+            ];
+            
+            let enemy_mesh = graphics::Mesh::new_polygon(
                 ctx,
                 DrawMode::fill(),
-                enemy.pos,
-                8.0,
-                0.1,
+                &enemy_points,
                 Color::YELLOW,
             )?;
             canvas.draw(&enemy_mesh, graphics::DrawParam::default());
