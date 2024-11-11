@@ -4,6 +4,23 @@ use rand::Rng;
 use ggez::event::{self, EventHandler};
 use ggez::input::keyboard::{KeyCode, KeyInput};
 use glam::{Vec2, vec2};
+
+#[derive(Clone)]
+struct Projectile {
+    pos: Vec2,
+    segment: usize,
+    progress: f32, // 1.0 = outer, 0.0 = inner
+}
+
+impl Projectile {
+    fn new(segment: usize, web_points_outer: &[Vec2]) -> Self {
+        Projectile {
+            pos: web_points_outer[segment],
+            segment,
+            progress: 1.0,
+        }
+    }
+}
 use std::f32::consts::PI;
 
 const NUM_SEGMENTS: usize = 16;
@@ -12,6 +29,7 @@ const OUTER_RADIUS: f32 = 300.0;
 const ENEMY_SPEED: f32 = 100.0;
 const SPAWN_INTERVAL: f32 = 2.0; // Spawn enemy every 2 seconds
 const COLLISION_RADIUS: f32 = 15.0; // Collision detection radius
+const PROJECTILE_SPEED: f32 = 400.0;
 
 #[derive(Clone)]
 struct Enemy {
@@ -36,6 +54,7 @@ struct GameState {
     web_points_inner: Vec<Vec2>,
     web_points_outer: Vec<Vec2>,
     enemies: Vec<Enemy>,
+    projectiles: Vec<Projectile>,
     spawn_timer: f32,
     game_over: bool,
 }
@@ -66,6 +85,7 @@ impl GameState {
             web_points_inner,
             web_points_outer,
             enemies: Vec::new(),
+            projectiles: Vec::new(),
             spawn_timer: 0.0,
             game_over: false,
         }
@@ -135,6 +155,40 @@ impl EventHandler for GameState {
             self.enemies.push(Enemy::new(segment, &self.web_points_inner));
         }
         
+        // Update projectile positions
+        for projectile in &mut self.projectiles {
+            projectile.progress -= PROJECTILE_SPEED * dt / (OUTER_RADIUS - INNER_RADIUS);
+            
+            let start = self.web_points_outer[projectile.segment];
+            let end = self.web_points_inner[projectile.segment];
+            projectile.pos = start.lerp(end, 1.0 - projectile.progress);
+        }
+
+        // Check projectile-enemy collisions
+        let mut destroyed_enemies = Vec::new();
+        let mut destroyed_projectiles = Vec::new();
+        
+        for (proj_idx, projectile) in self.projectiles.iter().enumerate() {
+            for (enemy_idx, enemy) in self.enemies.iter().enumerate() {
+                let distance = (enemy.pos - projectile.pos).length();
+                if distance < COLLISION_RADIUS {
+                    destroyed_enemies.push(enemy_idx);
+                    destroyed_projectiles.push(proj_idx);
+                }
+            }
+        }
+
+        // Remove destroyed entities
+        for &idx in destroyed_enemies.iter().rev() {
+            self.enemies.remove(idx);
+        }
+        for &idx in destroyed_projectiles.iter().rev() {
+            self.projectiles.remove(idx);
+        }
+
+        // Remove projectiles that reached the inner ring
+        self.projectiles.retain(|proj| proj.progress > 0.0);
+
         // Update enemy positions
         for enemy in &mut self.enemies {
             enemy.progress += ENEMY_SPEED * dt / (OUTER_RADIUS - INNER_RADIUS);
@@ -172,6 +226,19 @@ impl EventHandler for GameState {
         
         canvas.draw(&player, graphics::DrawParam::default());
         
+        // Draw projectiles
+        for projectile in &self.projectiles {
+            let projectile_mesh = graphics::Mesh::new_circle(
+                ctx,
+                DrawMode::fill(),
+                projectile.pos,
+                5.0,
+                0.1,
+                Color::CYAN,
+            )?;
+            canvas.draw(&projectile_mesh, graphics::DrawParam::default());
+        }
+
         // Draw enemies
         for enemy in &self.enemies {
             let enemy_mesh = graphics::Mesh::new_circle(
@@ -197,7 +264,14 @@ impl EventHandler for GameState {
     }
 
     fn key_down_event(&mut self, _ctx: &mut Context, input: KeyInput, _repeat: bool) -> GameResult {
+        if self.game_over {
+            return Ok(());
+        }
+
         match input.keycode {
+            Some(KeyCode::Space) => {
+                self.projectiles.push(Projectile::new(self.player_segment, &self.web_points_outer));
+            },
             Some(KeyCode::Left) => {
                 self.player_segment = (self.player_segment + 1) % NUM_SEGMENTS;
                 let new_pos = self.web_points_outer[self.player_segment];
