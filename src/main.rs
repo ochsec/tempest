@@ -219,10 +219,28 @@ impl EventHandler for GameState {
         let direction = Vec2::new(angle.cos(), angle.sin());
         let perp = Vec2::new(-direction.y, direction.x);
         
+        // Create U-shaped player like original Tempest
+        let base_width = 16.0;
+        let arm_length = 20.0;
+        let arm_width = 3.0;
+        
+        // Calculate the base points of the U shape
+        let base_left = self.player_pos - perp * (base_width/2.0);
+        let base_right = self.player_pos + perp * (base_width/2.0);
+        
+        // Calculate the arm points
+        let left_outer = base_left + direction * arm_length;
+        let left_inner = base_left + direction * arm_length - perp * arm_width;
+        let right_outer = base_right + direction * arm_length;
+        let right_inner = base_right + direction * arm_length + perp * arm_width;
+        
         let player_points = [
-            self.player_pos - perp * 8.0,  // left point
-            self.player_pos + direction * 15.0,  // front point
-            self.player_pos + perp * 8.0,  // right point
+            base_left,
+            left_outer,
+            left_inner,
+            right_inner,
+            right_outer,
+            base_right,
         ];
         
         let player = graphics::Mesh::new_polygon(
@@ -249,14 +267,20 @@ impl EventHandler for GameState {
 
         // Draw enemies
         for enemy in &self.enemies {
-            // Create rotating diamond shape for enemy
-            let rotation = timer::time_since_start(ctx).as_secs_f32() * 2.0;
-            let size = 10.0;
+            // Create Tempest-style "flipper" enemy shape
+            let angle = (enemy.segment as f32 * 2.0 * PI) / NUM_SEGMENTS as f32;
+            let direction = Vec2::new(angle.cos(), angle.sin());
+            let perp = Vec2::new(-direction.y, direction.x);
+            
+            let size = 12.0;
+            let width = 8.0;
+            
+            // Calculate points for angular flipper shape
             let enemy_points = [
-                Vec2::new(enemy.pos.x + size * rotation.cos(), enemy.pos.y + size * rotation.sin()),
-                Vec2::new(enemy.pos.x - size * rotation.sin(), enemy.pos.y + size * rotation.cos()),
-                Vec2::new(enemy.pos.x - size * rotation.cos(), enemy.pos.y - size * rotation.sin()),
-                Vec2::new(enemy.pos.x + size * rotation.sin(), enemy.pos.y - size * rotation.cos()),
+                enemy.pos + direction * size,  // front point
+                enemy.pos + perp * width - direction * (size/2.0),  // left wing
+                enemy.pos - direction * (size/2.0),  // back point
+                enemy.pos - perp * width - direction * (size/2.0),  // right wing
             ];
             
             let enemy_mesh = graphics::Mesh::new_polygon(
