@@ -1,4 +1,4 @@
-use ggez::{Context, ContextBuilder, GameResult, timer};
+use ggez::{Context, ContextBuilder, GameResult};
 use ggez::graphics::{self, Color, DrawMode, Mesh};
 use rand::Rng;
 use ggez::event::{self, EventHandler};
@@ -6,7 +6,7 @@ use ggez::input::keyboard::{KeyCode, KeyInput};
 use glam::{Vec2, vec2};
 
 mod levels;
-use levels::{LevelConfig, EnemyType};
+use levels::LevelConfig;
 
 #[derive(Clone)]
 struct Projectile {

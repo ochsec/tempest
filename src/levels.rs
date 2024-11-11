@@ -1,5 +1,3 @@
-use glam::Vec2;
-use std::f32::consts::PI;
 
 pub struct LevelConfig {
     pub num_segments: usize,
@@ -7,21 +5,8 @@ pub struct LevelConfig {
     pub outer_radius: f32,
     pub enemy_speed: f32,
     pub spawn_interval: f32,
-    pub enemy_types: Vec<EnemyType>,
-    pub color_scheme: ColorScheme,
 }
 
-pub enum EnemyType {
-    Flipper,
-    Tanker,
-    Spiker,
-}
-
-pub struct ColorScheme {
-    pub inner_ring: (f32, f32, f32),
-    pub outer_ring: (f32, f32, f32),
-    pub segments: (f32, f32, f32),
-}
 
 impl LevelConfig {
     pub fn get_level(level: usize) -> Self {
@@ -46,12 +31,6 @@ impl LevelConfig {
             outer_radius: 300.0,
             enemy_speed: 100.0,
             spawn_interval: 2.0,
-            enemy_types: vec![EnemyType::Flipper],
-            color_scheme: ColorScheme {
-                inner_ring: (0.0, 1.0, 0.0),
-                outer_ring: (1.0, 0.0, 0.0),
-                segments: (0.0, 0.0, 1.0),
-            },
         }
     }
 
@@ -62,12 +41,6 @@ impl LevelConfig {
             outer_radius: 320.0,
             enemy_speed: 120.0,
             spawn_interval: 1.8,
-            enemy_types: vec![EnemyType::Flipper, EnemyType::Tanker],
-            color_scheme: ColorScheme {
-                inner_ring: (1.0, 1.0, 0.0),
-                outer_ring: (0.0, 1.0, 1.0),
-                segments: (1.0, 0.0, 1.0),
-            },
         }
     }
 
@@ -78,12 +51,6 @@ impl LevelConfig {
             outer_radius: 340.0,
             enemy_speed: 140.0,
             spawn_interval: 1.6,
-            enemy_types: vec![EnemyType::Flipper, EnemyType::Tanker, EnemyType::Spiker],
-            color_scheme: ColorScheme {
-                inner_ring: (0.0, 1.0, 0.5),
-                outer_ring: (1.0, 0.5, 0.0),
-                segments: (0.5, 0.0, 1.0),
-            },
         }
     }
 
@@ -96,12 +63,6 @@ impl LevelConfig {
             outer_radius: 350.0,
             enemy_speed: 160.0,
             spawn_interval: 1.4,
-            enemy_types: vec![EnemyType::Flipper, EnemyType::Tanker, EnemyType::Spiker],
-            color_scheme: ColorScheme {
-                inner_ring: (1.0, 0.0, 0.5),
-                outer_ring: (0.0, 0.5, 1.0),
-                segments: (0.5, 1.0, 0.0),
-            },
         }
     }
 
