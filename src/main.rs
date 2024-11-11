@@ -98,7 +98,7 @@ impl GameState {
         let mut meshes = Vec::new();
         
         // Draw the segments
-        for i in 0..NUM_SEGMENTS {
+        for i in 0..self.level_config.num_segments {
             // Draw lines from inner to outer points
             let line = Mesh::new_line(
                 ctx,
@@ -109,7 +109,7 @@ impl GameState {
             meshes.push(line);
             
             // Draw inner ring segments
-            let next_i = (i + 1) % NUM_SEGMENTS;
+            let next_i = (i + 1) % self.level_config.num_segments;
             let inner_segment = Mesh::new_line(
                 ctx,
                 &[self.web_points_inner[i], self.web_points_inner[next_i]],
@@ -344,12 +344,12 @@ impl EventHandler for GameState {
                 self.projectiles.push(Projectile::new(self.player_segment, &self.web_points_outer));
             },
             Some(KeyCode::Left) => {
-                self.player_segment = (self.player_segment + 1) % NUM_SEGMENTS;
+                self.player_segment = (self.player_segment + 1) % self.level_config.num_segments;
                 let new_pos = self.web_points_outer[self.player_segment];
                 self.player_pos = new_pos;
             },
             Some(KeyCode::Right) => {
-                self.player_segment = (self.player_segment + NUM_SEGMENTS - 1) % NUM_SEGMENTS;
+                self.player_segment = (self.player_segment + self.level_config.num_segments - 1) % self.level_config.num_segments;
                 let new_pos = self.web_points_outer[self.player_segment];
                 self.player_pos = new_pos;
             },
