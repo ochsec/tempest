@@ -11,6 +11,7 @@ const INNER_RADIUS: f32 = 100.0;
 const OUTER_RADIUS: f32 = 300.0;
 const ENEMY_SPEED: f32 = 100.0;
 const SPAWN_INTERVAL: f32 = 2.0; // Spawn enemy every 2 seconds
+const COLLISION_RADIUS: f32 = 15.0; // Collision detection radius
 
 #[derive(Clone)]
 struct Enemy {
@@ -36,6 +37,7 @@ struct GameState {
     web_points_outer: Vec<Vec2>,
     enemies: Vec<Enemy>,
     spawn_timer: f32,
+    game_over: bool,
 }
 
 impl GameState {
@@ -65,6 +67,7 @@ impl GameState {
             web_points_outer,
             enemies: Vec::new(),
             spawn_timer: 0.0,
+            game_over: false,
         }
     }
 
@@ -108,7 +111,20 @@ impl GameState {
 
 impl EventHandler for GameState {
     fn update(&mut self, ctx: &mut Context) -> GameResult {
+        if self.game_over {
+            return Ok(());
+        }
+
         let dt = timer::delta(ctx).as_secs_f32();
+
+        // Check collisions
+        for enemy in &self.enemies {
+            let distance = (enemy.pos - self.player_pos).length();
+            if distance < COLLISION_RADIUS {
+                self.game_over = true;
+                return Ok(());
+            }
+        }
         
         // Update spawn timer
         self.spawn_timer += dt;
@@ -169,6 +185,13 @@ impl EventHandler for GameState {
             canvas.draw(&enemy_mesh, graphics::DrawParam::default());
         }
         
+        // Draw game over text if needed
+        if self.game_over {
+            let text = graphics::Text::new("Game Over!");
+            let dest = Vec2::new(350.0, 250.0);
+            canvas.draw(&text, graphics::DrawParam::default().dest(dest).color(Color::RED));
+        }
+
         canvas.finish(ctx)?;
         Ok(())
     }
