@@ -1,5 +1,6 @@
-use ggez::{Context, ContextBuilder, GameResult};
+use ggez::{Context, ContextBuilder, GameResult, timer};
 use ggez::graphics::{self, Color, DrawMode, Mesh};
+use rand::Rng;
 use ggez::event::{self, EventHandler};
 use ggez::input::keyboard::{KeyCode, KeyInput};
 use glam::{Vec2, vec2};
@@ -8,12 +9,33 @@ use std::f32::consts::PI;
 const NUM_SEGMENTS: usize = 16;
 const INNER_RADIUS: f32 = 100.0;
 const OUTER_RADIUS: f32 = 300.0;
+const ENEMY_SPEED: f32 = 100.0;
+const SPAWN_INTERVAL: f32 = 2.0; // Spawn enemy every 2 seconds
+
+#[derive(Clone)]
+struct Enemy {
+    pos: Vec2,
+    segment: usize,
+    progress: f32, // 0.0 = inner, 1.0 = outer
+}
+
+impl Enemy {
+    fn new(segment: usize, web_points_inner: &[Vec2]) -> Self {
+        Enemy {
+            pos: web_points_inner[segment],
+            segment,
+            progress: 0.0,
+        }
+    }
+}
 
 struct GameState {
     player_pos: Vec2,
     player_segment: usize,
     web_points_inner: Vec<Vec2>,
     web_points_outer: Vec<Vec2>,
+    enemies: Vec<Enemy>,
+    spawn_timer: f32,
 }
 
 impl GameState {
@@ -41,6 +63,8 @@ impl GameState {
             player_segment: 0,
             web_points_inner,
             web_points_outer,
+            enemies: Vec::new(),
+            spawn_timer: 0.0,
         }
     }
 
@@ -83,7 +107,31 @@ impl GameState {
 }
 
 impl EventHandler for GameState {
-    fn update(&mut self, _ctx: &mut Context) -> GameResult {
+    fn update(&mut self, ctx: &mut Context) -> GameResult {
+        let dt = timer::delta(ctx).as_secs_f32();
+        
+        // Update spawn timer
+        self.spawn_timer += dt;
+        if self.spawn_timer >= SPAWN_INTERVAL {
+            self.spawn_timer = 0.0;
+            let mut rng = rand::thread_rng();
+            let segment = rng.gen_range(0..NUM_SEGMENTS);
+            self.enemies.push(Enemy::new(segment, &self.web_points_inner));
+        }
+        
+        // Update enemy positions
+        for enemy in &mut self.enemies {
+            enemy.progress += ENEMY_SPEED * dt / (OUTER_RADIUS - INNER_RADIUS);
+            enemy.progress = enemy.progress.min(1.0);
+            
+            let start = self.web_points_inner[enemy.segment];
+            let end = self.web_points_outer[enemy.segment];
+            enemy.pos = start.lerp(end, enemy.progress);
+        }
+        
+        // Remove enemies that reached the outer ring
+        self.enemies.retain(|enemy| enemy.progress < 1.0);
+        
         Ok(())
     }
 
@@ -107,6 +155,20 @@ impl EventHandler for GameState {
         )?;
         
         canvas.draw(&player, graphics::DrawParam::default());
+        
+        // Draw enemies
+        for enemy in &self.enemies {
+            let enemy_mesh = graphics::Mesh::new_circle(
+                ctx,
+                DrawMode::fill(),
+                enemy.pos,
+                8.0,
+                0.1,
+                Color::YELLOW,
+            )?;
+            canvas.draw(&enemy_mesh, graphics::DrawParam::default());
+        }
+        
         canvas.finish(ctx)?;
         Ok(())
     }
