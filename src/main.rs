@@ -157,7 +157,7 @@ impl EventHandler for GameState {
             return Ok(());
         }
 
-        let dt = timer::delta(ctx).as_secs_f32();
+        let dt = ctx.time.delta().as_secs_f32();
 
         // Check collisions
         for enemy in &self.enemies {
@@ -179,7 +179,7 @@ impl EventHandler for GameState {
         
         // Update projectile positions
         for projectile in &mut self.projectiles {
-            projectile.progress -= PROJECTILE_SPEED * dt / (OUTER_RADIUS - INNER_RADIUS);
+            projectile.progress -= PROJECTILE_SPEED * dt / (self.level_config.outer_radius - self.level_config.inner_radius);
             
             let start = self.web_points_outer[projectile.segment];
             let end = self.web_points_inner[projectile.segment];
@@ -213,7 +213,7 @@ impl EventHandler for GameState {
 
         // Update enemy positions
         for enemy in &mut self.enemies {
-            enemy.progress += ENEMY_SPEED * dt / (OUTER_RADIUS - INNER_RADIUS);
+            enemy.progress += self.level_config.enemy_speed * dt / (self.level_config.outer_radius - self.level_config.inner_radius);
             enemy.progress = enemy.progress.min(1.0);
             
             let start = self.web_points_inner[enemy.segment];
@@ -246,7 +246,7 @@ impl EventHandler for GameState {
         }
         
         // Draw the player (triangular ship)
-        let angle = (self.player_segment as f32 * 2.0 * PI) / NUM_SEGMENTS as f32;
+        let angle = (self.player_segment as f32 * 2.0 * PI) / self.level_config.num_segments as f32;
         let direction = Vec2::new(angle.cos(), angle.sin());
         let perp = Vec2::new(-direction.y, direction.x);
         
@@ -299,7 +299,7 @@ impl EventHandler for GameState {
         // Draw enemies
         for enemy in &self.enemies {
             // Create Tempest-style "flipper" enemy shape
-            let angle = (enemy.segment as f32 * 2.0 * PI) / NUM_SEGMENTS as f32;
+            let angle = (enemy.segment as f32 * 2.0 * PI) / self.level_config.num_segments as f32;
             let direction = Vec2::new(angle.cos(), angle.sin());
             let perp = Vec2::new(-direction.y, direction.x);
             
