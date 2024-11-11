@@ -5,6 +5,9 @@ use ggez::event::{self, EventHandler};
 use ggez::input::keyboard::{KeyCode, KeyInput};
 use glam::{Vec2, vec2};
 
+mod levels;
+use levels::{LevelConfig, EnemyType};
+
 #[derive(Clone)]
 struct Projectile {
     pos: Vec2,
@@ -23,12 +26,7 @@ impl Projectile {
 }
 use std::f32::consts::PI;
 
-const NUM_SEGMENTS: usize = 16;
-const INNER_RADIUS: f32 = 100.0;
-const OUTER_RADIUS: f32 = 300.0;
-const ENEMY_SPEED: f32 = 100.0;
-const SPAWN_INTERVAL: f32 = 2.0; // Spawn enemy every 2 seconds
-const COLLISION_RADIUS: f32 = 15.0; // Collision detection radius
+const COLLISION_RADIUS: f32 = 15.0;
 const PROJECTILE_SPEED: f32 = 400.0;
 
 #[derive(Clone)]
@@ -57,30 +55,33 @@ struct GameState {
     projectiles: Vec<Projectile>,
     spawn_timer: f32,
     game_over: bool,
+    current_level: usize,
+    level_config: LevelConfig,
 }
 
 impl GameState {
     fn new() -> Self {
-        let mut web_points_inner = Vec::with_capacity(NUM_SEGMENTS);
-        let mut web_points_outer = Vec::with_capacity(NUM_SEGMENTS);
+        let level_config = LevelConfig::get_level(0);
+        let mut web_points_inner = Vec::with_capacity(level_config.num_segments);
+        let mut web_points_outer = Vec::with_capacity(level_config.num_segments);
         
         // Calculate points for the web structure
-        for i in 0..NUM_SEGMENTS {
-            let angle = (i as f32 * 2.0 * PI) / NUM_SEGMENTS as f32;
+        for i in 0..level_config.num_segments {
+            let angle = (i as f32 * 2.0 * PI) / level_config.num_segments as f32;
             
             // Calculate inner ring points
-            let x = 400.0 + angle.cos() * INNER_RADIUS;
-            let y = 300.0 + angle.sin() * INNER_RADIUS;
+            let x = 400.0 + angle.cos() * level_config.inner_radius;
+            let y = 300.0 + angle.sin() * level_config.inner_radius;
             web_points_inner.push(vec2(x, y));
             
             // Calculate outer ring points
-            let x = 400.0 + angle.cos() * OUTER_RADIUS;
-            let y = 300.0 + angle.sin() * OUTER_RADIUS;
+            let x = 400.0 + angle.cos() * level_config.outer_radius;
+            let y = 300.0 + angle.sin() * level_config.outer_radius;
             web_points_outer.push(vec2(x, y));
         }
 
         GameState {
-            player_pos: Vec2::new(400.0 + OUTER_RADIUS, 300.0), // Start at rightmost outer point
+            player_pos: Vec2::new(400.0 + level_config.outer_radius, 300.0),
             player_segment: 0,
             web_points_inner,
             web_points_outer,
@@ -88,6 +89,8 @@ impl GameState {
             projectiles: Vec::new(),
             spawn_timer: 0.0,
             game_over: false,
+            current_level: 0,
+            level_config,
         }
     }
 
@@ -127,6 +130,25 @@ impl GameState {
         
         Ok(meshes)
     }
+
+    fn rebuild_web_structure(&mut self) {
+        self.web_points_inner.clear();
+        self.web_points_outer.clear();
+        
+        for i in 0..self.level_config.num_segments {
+            let angle = (i as f32 * 2.0 * PI) / self.level_config.num_segments as f32;
+            
+            // Calculate inner ring points
+            let x = 400.0 + angle.cos() * self.level_config.inner_radius;
+            let y = 300.0 + angle.sin() * self.level_config.inner_radius;
+            self.web_points_inner.push(vec2(x, y));
+            
+            // Calculate outer ring points
+            let x = 400.0 + angle.cos() * self.level_config.outer_radius;
+            let y = 300.0 + angle.sin() * self.level_config.outer_radius;
+            self.web_points_outer.push(vec2(x, y));
+        }
+    }
 }
 
 impl EventHandler for GameState {
@@ -148,10 +170,10 @@ impl EventHandler for GameState {
         
         // Update spawn timer
         self.spawn_timer += dt;
-        if self.spawn_timer >= SPAWN_INTERVAL {
+        if self.spawn_timer >= self.level_config.spawn_interval {
             self.spawn_timer = 0.0;
             let mut rng = rand::thread_rng();
-            let segment = rng.gen_range(0..NUM_SEGMENTS);
+            let segment = rng.gen_range(0..self.level_config.num_segments);
             self.enemies.push(Enemy::new(segment, &self.web_points_inner));
         }
         
@@ -201,6 +223,15 @@ impl EventHandler for GameState {
         
         // Remove enemies that reached the outer ring
         self.enemies.retain(|enemy| enemy.progress < 1.0);
+        
+        // Check for level completion (when player has destroyed 20 enemies)
+        if self.enemies.is_empty() && self.current_level < 9 {
+            self.current_level += 1;
+            self.level_config = LevelConfig::get_level(self.current_level);
+            self.spawn_timer = 0.0;
+            // Rebuild web structure for new level
+            self.rebuild_web_structure();
+        }
         
         Ok(())
     }
