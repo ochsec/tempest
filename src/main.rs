@@ -173,6 +173,76 @@ impl GameState {
                     ));
                 }
             },
+            LevelShape::Star => {
+                // Star-shaped layout with 5 points
+                for i in 0..self.level_config.num_segments {
+                    let t = i as f32 / self.level_config.num_segments as f32;
+                    let angle = t * 2.0 * PI;
+                    let radius_factor = if i % 2 == 0 { 1.0 } else { 0.5 };
+                    
+                    let inner_r = self.level_config.inner_radius * radius_factor;
+                    let outer_r = self.level_config.outer_radius * radius_factor;
+                    
+                    self.web_points_inner.push(vec2(
+                        512.0 + angle.cos() * inner_r,
+                        384.0 + angle.sin() * inner_r
+                    ));
+                    self.web_points_outer.push(vec2(
+                        512.0 + angle.cos() * outer_r,
+                        384.0 + angle.sin() * outer_r
+                    ));
+                }
+            },
+            LevelShape::Spiral => {
+                // Spiral layout
+                for i in 0..self.level_config.num_segments {
+                    let t = i as f32 / self.level_config.num_segments as f32;
+                    let angle = t * 4.0 * PI; // Two full rotations
+                    let radius_factor = 0.2 + 0.8 * t; // Gradually increases radius
+                    
+                    let inner_r = self.level_config.inner_radius * radius_factor;
+                    let outer_r = self.level_config.outer_radius * radius_factor;
+                    
+                    self.web_points_inner.push(vec2(
+                        512.0 + angle.cos() * inner_r,
+                        384.0 + angle.sin() * inner_r
+                    ));
+                    self.web_points_outer.push(vec2(
+                        512.0 + angle.cos() * outer_r,
+                        384.0 + angle.sin() * outer_r
+                    ));
+                }
+            },
+            LevelShape::Pentagon => {
+                // Pentagon layout
+                for i in 0..self.level_config.num_segments {
+                    let t = (i as f32 * 5.0) / self.level_config.num_segments as f32;
+                    let angle = PI * (0.4 * t - 0.5); // Start from top point
+                    
+                    let x = 512.0 + angle.cos() * self.level_config.inner_radius;
+                    let y = 384.0 + angle.sin() * self.level_config.inner_radius;
+                    self.web_points_inner.push(vec2(x, y));
+                    
+                    let x = 512.0 + angle.cos() * self.level_config.outer_radius;
+                    let y = 384.0 + angle.sin() * self.level_config.outer_radius;
+                    self.web_points_outer.push(vec2(x, y));
+                }
+            },
+            LevelShape::Octagon => {
+                // Octagon layout
+                for i in 0..self.level_config.num_segments {
+                    let t = (i as f32 * 8.0) / self.level_config.num_segments as f32;
+                    let angle = PI * (0.25 * t); // Eight equal sides
+                    
+                    let x = 512.0 + angle.cos() * self.level_config.inner_radius;
+                    let y = 384.0 + angle.sin() * self.level_config.inner_radius;
+                    self.web_points_inner.push(vec2(x, y));
+                    
+                    let x = 512.0 + angle.cos() * self.level_config.outer_radius;
+                    let y = 384.0 + angle.sin() * self.level_config.outer_radius;
+                    self.web_points_outer.push(vec2(x, y));
+                }
+            },
             _ => {
                 // Fallback to circle if shape not implemented yet
                 for i in 0..self.level_config.num_segments {
