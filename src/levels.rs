@@ -27,8 +27,8 @@ impl LevelConfig {
     fn level_1() -> Self {
         LevelConfig {
             num_segments: 16,
-            inner_radius: 100.0,
-            outer_radius: 300.0,
+            inner_radius: 80.0,
+            outer_radius: 250.0,
             enemy_speed: 100.0,
             spawn_interval: 2.0,
         }
@@ -37,8 +37,8 @@ impl LevelConfig {
     fn level_2() -> Self {
         LevelConfig {
             num_segments: 32,
-            inner_radius: 120.0,
-            outer_radius: 320.0,
+            inner_radius: 100.0,
+            outer_radius: 270.0,
             enemy_speed: 120.0,
             spawn_interval: 1.8,
         }
@@ -47,8 +47,8 @@ impl LevelConfig {
     fn level_3() -> Self {
         LevelConfig {
             num_segments: 24,
-            inner_radius: 80.0,
-            outer_radius: 340.0,
+            inner_radius: 120.0,
+            outer_radius: 290.0,
             enemy_speed: 140.0,
             spawn_interval: 1.6,
         }
@@ -59,8 +59,8 @@ impl LevelConfig {
     fn level_4() -> Self {
         LevelConfig {
             num_segments: 40,
-            inner_radius: 150.0,
-            outer_radius: 350.0,
+            inner_radius: 140.0,
+            outer_radius: 310.0,
             enemy_speed: 160.0,
             spawn_interval: 1.4,
         }

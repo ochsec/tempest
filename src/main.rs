@@ -362,7 +362,7 @@ impl EventHandler for GameState {
 fn main() -> GameResult {
     let (ctx, event_loop) = ContextBuilder::new("tempest", "Your Name")
         .window_setup(ggez::conf::WindowSetup::default().title("Tempest"))
-        .window_mode(ggez::conf::WindowMode::default().dimensions(800.0, 600.0))
+        .window_mode(ggez::conf::WindowMode::default().dimensions(1024.0, 768.0))
         .build()?;
 
     let state = GameState::new();
