@@ -47,6 +47,7 @@ impl LevelConfig {
             enemy_speed: 100.0,
             spawn_interval: 2.0,
             enemies_to_destroy: 20,
+            shape: LevelShape::Circle,
         }
     }
 
@@ -58,6 +59,7 @@ impl LevelConfig {
             enemy_speed: 120.0,
             spawn_interval: 1.8,
             enemies_to_destroy: 25,
+            shape: LevelShape::Square,
         }
     }
 
@@ -69,6 +71,7 @@ impl LevelConfig {
             enemy_speed: 140.0,
             spawn_interval: 1.6,
             enemies_to_destroy: 30,
+            shape: LevelShape::V,
         }
     }
 
@@ -82,6 +85,7 @@ impl LevelConfig {
             enemy_speed: 160.0,
             spawn_interval: 1.4,
             enemies_to_destroy: 35,
+            shape: LevelShape::Triangle,
         }
     }
 
@@ -94,6 +98,7 @@ impl LevelConfig {
             enemy_speed: 180.0,
             spawn_interval: 1.2,
             enemies_to_destroy: 40,
+            shape: LevelShape::Cross,
         }
     }
 
@@ -105,6 +110,7 @@ impl LevelConfig {
             enemy_speed: 200.0,
             spawn_interval: 1.0,
             enemies_to_destroy: 45,
+            shape: LevelShape::Plus,
         }
     }
 
