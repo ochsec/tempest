@@ -70,18 +70,18 @@ impl GameState {
             let angle = (i as f32 * 2.0 * PI) / level_config.num_segments as f32;
             
             // Calculate inner ring points
-            let x = 400.0 + angle.cos() * level_config.inner_radius;
-            let y = 300.0 + angle.sin() * level_config.inner_radius;
+            let x = 512.0 + angle.cos() * level_config.inner_radius;
+            let y = 384.0 + angle.sin() * level_config.inner_radius;
             web_points_inner.push(vec2(x, y));
             
             // Calculate outer ring points
-            let x = 400.0 + angle.cos() * level_config.outer_radius;
-            let y = 300.0 + angle.sin() * level_config.outer_radius;
+            let x = 512.0 + angle.cos() * level_config.outer_radius;
+            let y = 384.0 + angle.sin() * level_config.outer_radius;
             web_points_outer.push(vec2(x, y));
         }
 
         GameState {
-            player_pos: Vec2::new(400.0 + level_config.outer_radius, 300.0),
+            player_pos: Vec2::new(512.0 + level_config.outer_radius, 384.0),
             player_segment: 0,
             web_points_inner,
             web_points_outer,
@@ -139,13 +139,13 @@ impl GameState {
             let angle = (i as f32 * 2.0 * PI) / self.level_config.num_segments as f32;
             
             // Calculate inner ring points
-            let x = 400.0 + angle.cos() * self.level_config.inner_radius;
-            let y = 300.0 + angle.sin() * self.level_config.inner_radius;
+            let x = 512.0 + angle.cos() * self.level_config.inner_radius;
+            let y = 384.0 + angle.sin() * self.level_config.inner_radius;
             self.web_points_inner.push(vec2(x, y));
             
             // Calculate outer ring points
-            let x = 400.0 + angle.cos() * self.level_config.outer_radius;
-            let y = 300.0 + angle.sin() * self.level_config.outer_radius;
+            let x = 512.0 + angle.cos() * self.level_config.outer_radius;
+            let y = 384.0 + angle.sin() * self.level_config.outer_radius;
             self.web_points_outer.push(vec2(x, y));
         }
     }
