@@ -43,6 +43,7 @@ impl LevelConfig {
             outer_radius: 270.0,
             enemy_speed: 120.0,
             spawn_interval: 1.8,
+            enemies_to_destroy: 25,
         }
     }
 
@@ -53,6 +54,7 @@ impl LevelConfig {
             outer_radius: 290.0,
             enemy_speed: 140.0,
             spawn_interval: 1.6,
+            enemies_to_destroy: 30,
         }
     }
 
@@ -65,14 +67,74 @@ impl LevelConfig {
             outer_radius: 310.0,
             enemy_speed: 160.0,
             spawn_interval: 1.4,
+            enemies_to_destroy: 35,
         }
     }
 
     // Levels 5-10 follow similar patterns with increasingly challenging configurations
-    fn level_5() -> Self { /* ... */ Self::level_4() }
-    fn level_6() -> Self { /* ... */ Self::level_4() }
-    fn level_7() -> Self { /* ... */ Self::level_4() }
-    fn level_8() -> Self { /* ... */ Self::level_4() }
-    fn level_9() -> Self { /* ... */ Self::level_4() }
-    fn level_10() -> Self { /* ... */ Self::level_4() }
+    fn level_5() -> Self {
+        LevelConfig {
+            num_segments: 48,
+            inner_radius: 160.0,
+            outer_radius: 330.0,
+            enemy_speed: 180.0,
+            spawn_interval: 1.2,
+            enemies_to_destroy: 40,
+        }
+    }
+
+    fn level_6() -> Self {
+        LevelConfig {
+            num_segments: 56,
+            inner_radius: 180.0,
+            outer_radius: 350.0,
+            enemy_speed: 200.0,
+            spawn_interval: 1.0,
+            enemies_to_destroy: 45,
+        }
+    }
+
+    fn level_7() -> Self {
+        LevelConfig {
+            num_segments: 64,
+            inner_radius: 200.0,
+            outer_radius: 370.0,
+            enemy_speed: 220.0,
+            spawn_interval: 0.9,
+            enemies_to_destroy: 50,
+        }
+    }
+
+    fn level_8() -> Self {
+        LevelConfig {
+            num_segments: 72,
+            inner_radius: 220.0,
+            outer_radius: 390.0,
+            enemy_speed: 240.0,
+            spawn_interval: 0.8,
+            enemies_to_destroy: 55,
+        }
+    }
+
+    fn level_9() -> Self {
+        LevelConfig {
+            num_segments: 80,
+            inner_radius: 240.0,
+            outer_radius: 410.0,
+            enemy_speed: 260.0,
+            spawn_interval: 0.7,
+            enemies_to_destroy: 60,
+        }
+    }
+
+    fn level_10() -> Self {
+        LevelConfig {
+            num_segments: 96,
+            inner_radius: 260.0,
+            outer_radius: 430.0,
+            enemy_speed: 280.0,
+            spawn_interval: 0.6,
+            enemies_to_destroy: 70,
+        }
+    }
 }
