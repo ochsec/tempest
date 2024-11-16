@@ -6,7 +6,7 @@ use ggez::input::keyboard::{KeyCode, KeyInput};
 use glam::{Vec2, vec2};
 
 mod levels;
-use levels::LevelConfig;
+use levels::{LevelConfig, LevelShape};
 
 #[derive(Clone)]
 struct Projectile {
