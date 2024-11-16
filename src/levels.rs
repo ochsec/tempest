@@ -146,6 +146,7 @@ impl LevelConfig {
             enemy_speed: 260.0,
             spawn_interval: 0.7,
             enemies_to_destroy: 60,
+            shape: LevelShape::Circle,
         }
     }
 
