@@ -5,6 +5,7 @@ pub struct LevelConfig {
     pub outer_radius: f32,
     pub enemy_speed: f32,
     pub spawn_interval: f32,
+    pub enemies_to_destroy: usize,
 }
 
 
@@ -31,6 +32,7 @@ impl LevelConfig {
             outer_radius: 250.0,
             enemy_speed: 100.0,
             spawn_interval: 2.0,
+            enemies_to_destroy: 20,
         }
     }
 

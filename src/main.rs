@@ -57,6 +57,7 @@ struct GameState {
     game_over: bool,
     current_level: usize,
     level_config: LevelConfig,
+    enemies_destroyed: usize,
 }
 
 impl GameState {
@@ -91,6 +92,7 @@ impl GameState {
             game_over: false,
             current_level: 0,
             level_config,
+            enemies_destroyed: 0,
         }
     }
 
@@ -200,9 +202,10 @@ impl EventHandler for GameState {
             }
         }
 
-        // Remove destroyed entities
+        // Remove destroyed entities and count kills
         for &idx in destroyed_enemies.iter().rev() {
             self.enemies.remove(idx);
+            self.enemies_destroyed += 1;
         }
         for &idx in destroyed_projectiles.iter().rev() {
             self.projectiles.remove(idx);
@@ -224,13 +227,14 @@ impl EventHandler for GameState {
         // Remove enemies that reached the outer ring
         self.enemies.retain(|enemy| enemy.progress < 1.0);
         
-        // Check for level completion (when player has destroyed 20 enemies)
-        if self.enemies.is_empty() && self.current_level < 9 {
+        // Check for level completion
+        if self.enemies_destroyed >= self.level_config.enemies_to_destroy && self.current_level < 9 {
             self.current_level += 1;
             self.level_config = LevelConfig::get_level(self.current_level);
             self.spawn_timer = 0.0;
             // Rebuild web structure for new level
             self.rebuild_web_structure();
+            self.enemies_destroyed = 0;
         }
         
         Ok(())
