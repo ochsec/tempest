@@ -137,18 +137,56 @@ impl GameState {
         self.web_points_inner.clear();
         self.web_points_outer.clear();
         
-        for i in 0..self.level_config.num_segments {
-            let angle = (i as f32 * 2.0 * PI) / self.level_config.num_segments as f32;
-            
-            // Calculate inner ring points
-            let x = 512.0 + angle.cos() * self.level_config.inner_radius;
-            let y = 384.0 + angle.sin() * self.level_config.inner_radius;
-            self.web_points_inner.push(vec2(x, y));
-            
-            // Calculate outer ring points
-            let x = 512.0 + angle.cos() * self.level_config.outer_radius;
-            let y = 384.0 + angle.sin() * self.level_config.outer_radius;
-            self.web_points_outer.push(vec2(x, y));
+        match self.level_config.shape {
+            LevelShape::Circle => {
+                // Current circular implementation
+                for i in 0..self.level_config.num_segments {
+                    let angle = (i as f32 * 2.0 * PI) / self.level_config.num_segments as f32;
+                    
+                    let x = 512.0 + angle.cos() * self.level_config.inner_radius;
+                    let y = 384.0 + angle.sin() * self.level_config.inner_radius;
+                    self.web_points_inner.push(vec2(x, y));
+                    
+                    let x = 512.0 + angle.cos() * self.level_config.outer_radius;
+                    let y = 384.0 + angle.sin() * self.level_config.outer_radius;
+                    self.web_points_outer.push(vec2(x, y));
+                }
+            },
+            LevelShape::Square => {
+                // Square/diamond layout
+                for i in 0..self.level_config.num_segments {
+                    let t = (i as f32 * 4.0) / self.level_config.num_segments as f32;
+                    let (x_factor, y_factor) = match t.floor() as i32 {
+                        0 => (1.0 - (t % 1.0), -1.0),
+                        1 => (-1.0, 1.0 - (t % 1.0)),
+                        2 => ((t % 1.0) - 1.0, 1.0),
+                        _ => (1.0, (t % 1.0) - 1.0),
+                    };
+                    
+                    self.web_points_inner.push(vec2(
+                        512.0 + x_factor * self.level_config.inner_radius,
+                        384.0 + y_factor * self.level_config.inner_radius
+                    ));
+                    self.web_points_outer.push(vec2(
+                        512.0 + x_factor * self.level_config.outer_radius,
+                        384.0 + y_factor * self.level_config.outer_radius
+                    ));
+                }
+            },
+            _ => {
+                // Fallback to circle if shape not implemented yet
+                for i in 0..self.level_config.num_segments {
+                    let angle = (i as f32 * 2.0 * PI) / self.level_config.num_segments as f32;
+                    
+                    let x = 512.0 + angle.cos() * self.level_config.inner_radius;
+                    let y = 384.0 + angle.sin() * self.level_config.inner_radius;
+                    self.web_points_inner.push(vec2(x, y));
+                    
+                    let x = 512.0 + angle.cos() * self.level_config.outer_radius;
+                    let y = 384.0 + angle.sin() * self.level_config.outer_radius;
+                    self.web_points_outer.push(vec2(x, y));
+                }
+            }
         }
     }
 }

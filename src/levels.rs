@@ -1,3 +1,16 @@
+#[derive(Clone, Copy)]
+pub enum LevelShape {
+    Circle,      // Standard circular layout
+    Square,      // Square/diamond layout
+    Plus,        // Plus-sign shape
+    V,           // V-shaped layout
+    Triangle,    // Triangle layout
+    Cross,       // X-shaped layout
+    Star,        // Star shape
+    Spiral,      // Spiral layout
+    Pentagon,    // Pentagon layout
+    Octagon,     // Octagon layout
+}
 
 pub struct LevelConfig {
     pub num_segments: usize,
@@ -6,6 +19,7 @@ pub struct LevelConfig {
     pub enemy_speed: f32,
     pub spawn_interval: f32,
     pub enemies_to_destroy: usize,
+    pub shape: LevelShape,
 }
 
 
