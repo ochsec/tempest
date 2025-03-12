@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)  # Upgraded for better FetchContent support
 project(tempest VERSION 1.0)
 
 # Specify the C++ standard
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)  # Upgraded to C++14 for std::make_unique
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Include FetchContent module

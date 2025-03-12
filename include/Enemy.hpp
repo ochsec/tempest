@@ -2,6 +2,8 @@
 #define TEMPEST_ENEMY_HPP
 
 #include <SFML/Graphics.hpp>
+#include <vector>
+#include <memory>
 #include "Playfield.hpp"
 
 namespace tempest {
@@ -30,6 +32,7 @@ public:
     void destroy();
     
 private:
+    // Enemy properties
     Type m_type;
     int m_lane;
     float m_depth;
@@ -38,9 +41,22 @@ private:
     sf::Vector2f m_position;
     float m_radius;
     bool m_destroyed;
-    sf::CircleShape m_shape;
     
+    // Vector graphics shapes
+    std::vector<std::unique_ptr<sf::Shape>> m_shapes;
+    
+    // Animation properties
+    float m_rotationAngle;
+    float m_pulseTimer;
+    bool m_pulseState;
+    
+    // Helper methods
     void updatePosition();
+    void createFlipperShape();
+    void createTankerShape();
+    void createSpikerShape();
+    void createFuseballShape();
+    void createPulsarShape();
 };
 
 } // namespace tempest

@@ -29,16 +29,50 @@ private:
     void render();
     void checkCollisions();
     
+    // Menu and UI methods
+    void renderMenu();
+    void renderGame();
+    void renderGameOver();
+    void renderLevelComplete();
+    void updateScoreText();
+    void drawTempestLogo();
+    
+    // Game state management
+    void startGame();
+    void startNextLevel();
+    void playerHit();
+    
+    // High score management
+    void loadHighScore();
+    void saveHighScore();
+    
+    // Window and rendering
     sf::RenderWindow m_window;
     sf::Clock m_clock;
-    GameState m_state;
+    sf::Font m_font;
     
+    // Game state
+    GameState m_state;
+    int m_score;
+    int m_highScore;
+    int m_level;
+    int m_lives;
+    
+    // Game objects
     Playfield m_playfield;
     Player m_player;
     EnemyManager m_enemyManager;
     LevelManager m_levelManager;
     
-    int m_score;
+    // UI elements
+    sf::Text m_titleText;
+    sf::Text m_instructionText;
+    sf::Text m_controlsText;
+    sf::Text m_scoreText;
+    sf::Text m_highScoreText;
+    sf::Text m_levelText;
+    sf::Text m_livesText;
+    sf::Text m_gameOverText;
 };
 
 } // namespace tempest
